@@ -1,6 +1,7 @@
 # API Document Generator
 
 This generator is built with Handlebars.js library. Runs on Node Server.
+This is a light weight API document generator uses a very less dependencies such as yamljs, handlebarsjs. Generates the API document in seconds.
 
 
 ## How it works?
