@@ -1,0 +1,128 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="{{config.desc}}">
+  <link href="{{config.favicon}}" rel="shortcut icon" />
+  <title>{{config.title}}</title>
+
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800|Roboto+Slab:400,300,700" rel="stylesheet" type="text/css">
+
+  <link href="styles/screen.css" rel="stylesheet" media="screen" />
+  <link href="styles/print.css" rel="stylesheet" media="print" />
+  <link href="styles/accordion-menu.css" rel="stylesheet"/>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</head>
+
+<body class="index">
+  <div class="top-band">
+    <div class="top-band">
+      <span id='navbar-toggle'>
+        <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M-.5 178v56h512v-56H-.5zm0 195h512v-57H-.5v57zm0 138h512v-56H-.5v56z"></path></svg>
+      </span>
+      <a href="{{config.logo.href}}" id="logo">
+        <img name="logo" src="{{config.logo.src}}" alt="{{config.product}}">
+      </a>
+      <span class="title">API Documentation</span>
+
+      {{#if config.producturl}}
+        <a type="button" href="{{config.producturl}}" id="signin" class="btn btn-danger navbar-btn siginbttns signin" style="background-color:#F0483E;border-color:#F0483E;color:#fff;text-transform:uppercase">ACCESS {{config.product}}</a>
+        <a type="button" href="{{config.producturl}}" id="signin" class="navbar-btn siginicon signin" style="float:right;color:#fff">
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Layer_1" x="0px" y="0px" width="32px" height="32px" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
+            <path fill="#a8a8a8" d="M454.426,392.582c-5.439-16.32-15.298-32.782-29.839-42.362c-27.979-18.572-60.578-28.479-92.099-39.085  c-7.604-2.664-15.33-5.568-22.279-9.7c-6.204-3.686-8.533-11.246-9.974-17.886c-0.636-3.512-1.026-7.116-1.228-10.661  c22.857-31.267,38.019-82.295,38.019-124.136c0-65.298-36.896-83.495-82.402-83.495c-45.515,0-82.403,18.17-82.403,83.468  c0,43.338,16.255,96.5,40.489,127.383c-0.221,2.438-0.511,4.876-0.95,7.303c-1.444,6.639-3.77,14.058-9.97,17.743  c-6.957,4.133-14.682,6.756-22.287,9.42c-31.521,10.605-64.119,19.957-92.091,38.529c-14.549,9.58-24.403,27.159-29.838,43.479  c-5.597,16.938-7.886,37.917-7.541,54.917h205.958h205.974C462.313,430.5,460.019,409.521,454.426,392.582z"/>
+          </svg>
+        </a>
+      {{/if}}
+
+      {{#if config.topband.link}}
+        <span class="menu-icon">
+          <a onclick="toggle_visibility('','top-links');">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="50" height="32" viewBox="0 0 32 22">
+              <path fill="#29B9FF" d="M9.984 20.016h-4.969v-8.016h-3l9.984-9 9.984 9h-3v8.016h-4.969v-6h-4.031v6z"></path>
+            </svg>
+          </a>
+        </span>
+        <ul class="top-links">
+          {{#each config.topband.link as |link|}}
+            <li>
+              <a href="{{link.href}}">{{link.name}}</a>
+            </li>
+          {{/each}}
+        </ul>
+      {{/if}}
+
+      {{#if config.topband.twitterurl}}
+        <a class="twitter-button" title="Tweet About Us" href="{{config.topband.twitterurl}}">
+          <img style="margin-right:5px" src="images/twitter-icon.png" alt="Tweet About Us">Share this API doc
+        </a>
+      {{/if}}
+
+      </div>
+    </div>
+    <div class="tocify-wrapper" id="tocify-wrapper">
+      <div>
+        <ul>
+          {{#each includes as |test|}}
+            <li>
+              <span class='accordion'>
+                {{#if test.parentScopeNotRequired}}
+                  <a data-uniq-element="{{test.href}}">
+                {{else}}
+                  <a data-uniq-element="{{test.href}}_{{test.name}}">
+                {{/if}}
+                  {{test.name}}
+                  {{#if test.subLinks}}
+                  <span class='arrow-down-open'>
+                     <svg class='icon' version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                     <polygon points="255.5,450 1.5,193.2 1.5,255.2 255.5,512 509.5,255.2 509.5,193.2 "/>
+                   </svg>
+                 </span>
+                 <span class='arrow-right-open'>
+                   <svg class='icon' version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                   viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+                   <g id="Layer_2_2_">
+                     <path d="M156.5,501.8l232.8-230.9c8.5-8.5,8.5-22.3,0-31.8L156.5,8.3c-4-3-9.5-5.3-15.2-5.3l0,0c-19.3,0-28.9,23.4-15.2,37.1
+                     l217.3,215.4L126.1,471c-13.7,13.6-4.1,37.1,15.2,37.1l0,0C147,508,152.4,505.8,156.5,501.8z"/>
+                   </g>
+                 </svg>
+               </span>
+              {{/if}}
+            </a>
+          </span>
+          <ul class='panel'>
+            {{#each test.subLinks as |sublink|}}
+              {{#if test.parentScopeNotRequired}}
+                <li class='item'><a data-uniq-element="{{sublink.href}}">{{sublink.name}}</a></li>
+              {{else}}
+                <li class='item'><a data-uniq-element="{{test.href}}_{{sublink.href}}">{{sublink.name}}</a></li>
+              {{/if}}
+            {{/each}}
+          </ul>
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</div>
+
+{{includesString}}
+
+
+<div class="page-wrapper" id='page-wrapper'>
+  <div class="dark-box"></div>
+  <div class="content">
+    {{partial 'introduction'}}
+    {{partial 'getting-started'}}
+    {{{htmlStream}}}
+  </div>
+  <div class="dark-box">
+  </div>
+</div>
+<script src="js/accordion-menu.js"></script>
+<script src="js/custom.js"></script>
+</body>
+</html>

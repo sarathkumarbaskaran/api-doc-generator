@@ -1,0 +1,26 @@
+{
+  "product": "",
+  "producturl": "",
+  "apiendpoint": "",
+  "apiendpoint_suffix": "",
+  "title": "",
+  "favicon": "",
+  "isParams":true,
+  "logo": {
+    "src": "",
+    "href": ""
+  },
+  "topband": {
+    "twitterurl": "",
+    "link": [
+      {
+        "name": "",
+        "href": ""
+      }
+    ],
+    "signinurl": ""
+  },
+  "index":[
+    "Items"
+  ]
+}

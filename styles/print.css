@@ -1,0 +1,185 @@
+html {
+  font-family: sans-serif;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%
+}
+
+body {
+  margin: 0
+}
+
+a {
+  background-color: transparent
+}
+
+a:active,
+a:hover {
+  outline: 0
+}
+
+b,
+strong {
+  font-weight: bold
+}
+
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0
+}
+
+img {
+  border: 0;
+  vertical-align: middle
+}
+
+svg:not(:root) {
+  overflow: hidden
+}
+
+pre {
+  overflow: auto
+}
+
+code,
+kbd,
+pre {
+  font-family: monospace, monospace;
+  font-size: 1em
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0
+}
+
+td,
+th {
+
+  padding: 0
+}
+
+.content h1,
+.content h3,
+body {
+  font-family: "Open Sans", san-serif, arial;
+  font-size: 13px
+}
+
+.content pre,
+.content code {
+
+  font-family: Monaco, "Courier New", monospace;
+  font-size: 12px
+}
+
+.content pre,
+.content code {
+  -ms-word-break: break-all;
+  word-break: break-all;
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto
+}
+
+.tocify {
+  display: none
+}
+
+.content {
+  font-size: 12px
+}
+
+.content pre,
+.content code {
+  border: 1px solid #999;
+  border-radius: 5px;
+  font-size: 0.8em
+}
+
+.content pre code {
+  border: 0
+}
+
+.content pre {
+  padding: 1.3em
+}
+
+.content code {
+  padding: 0.2em
+}
+
+.content table {
+  border: 1px solid #999
+}
+
+.content table tr {
+  border-bottom: 1px solid #999
+}
+
+.content table td,
+.content table th {
+  padding: 0.7em
+}
+
+.content p {
+  line-height: 1.5
+}
+
+.content a {
+  text-decoration: none;
+  color: #000
+}
+
+.content h1 {
+  font-size: 2.5em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  margin-top: 1em;
+  margin-bottom: 20px;
+  border: 2px solid #ccc;
+  border-width: 2px 0;
+  text-align: center
+}
+
+.content h2 {
+  font-size: 1.8em;
+  margin-top: 2em;
+  border-top: 2px solid #ccc;
+  padding-top: 0.8em
+}
+
+
+.content h3 {
+  font-size: 0.8em;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  text-transform: uppercase
+}
+
+.content p {
+  line-height: 1.5
+}
+
+.content a {
+  text-decoration: none;
+  color: #000
+}
+
+.content h1 {
+  font-size: 2.5em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  margin-top: 1em;
+  margin-bottom: 20px;
+  border: 2px solid #ccc;
+  border-width: 2px 0;
+  text-align: center
+}
+
+.content h3 {
+  font-size: 0.8em;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  text-transform: uppercase
+}

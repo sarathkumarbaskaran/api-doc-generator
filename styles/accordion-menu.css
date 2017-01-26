@@ -1,0 +1,110 @@
+span.accordion {
+    display: block;
+    padding: 0 15px !important;
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 5px 10px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 13px;
+    transition: 0.1s;
+}
+span.accordion > a {
+  color: #000;
+  text-decoration: none;
+}
+
+li.item {
+  padding: 0 15px !important;
+}
+
+.item.active {
+  background-color: #2e8fda;
+  color: #fff;
+}
+
+span.accordion.active, span.accordion:hover {
+    background-color: #FAFAFA;
+}
+span.accordion.active > a {
+  color: #222;
+  text-decoration: none;
+}
+
+span.accordion .icon {
+  width: 10px;
+  height: 10px;
+  margin-top: 10px;
+  float: right;
+}
+
+span.accordion .arrow-right-open {
+  display: inline;
+  fill: #222;
+}
+span.accordion .arrow-down-open {
+  display: none;
+  fill: #222;
+}
+
+span.accordion.active .arrow-right-open {
+  display: none;
+}
+
+span.accordion.active .arrow-down-open {
+  display: inline;
+}
+
+
+ul.panel {
+    padding: 0;
+    font-size: 12px;
+    background-color: #F6F6F6;
+    max-height: 0;
+    overflow: hidden;
+    transition: 0.6s ease-in-out;
+    opacity: 0;
+}
+
+ul.panel > li > a {
+  color: #222;
+  display: block;
+  text-decoration: none !important;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+ul.panel > li.active > a {
+  color: #FFF;
+  text-decoration: none !important;
+}
+
+ul.panel.show {
+    opacity: 1;
+    max-height: 1200px;
+}
+
+pre.prettyprint {
+  padding: 20px !important;
+  border: none !important;
+}
+
+span.pun, span.opn, span.clo, span.pln, span.typ, span.lit, span.com {
+  color: #C9CDD0;
+}
+
+span.str {
+  color: #C3D358;
+}
+
+span.kwd {
+  color: #E87B7B;
+}
+
+code > span {
+  line-height: 22px;
+}

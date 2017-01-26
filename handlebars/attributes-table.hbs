@@ -1,0 +1,24 @@
+{{#each properties as |prop|}}
+  {{#if prop.name}}
+    {{#if @root.isSubJson}}
+      <div class="{{@root.href}}_ {{@root.href}}_{{@root.propName}}_ attribute row">
+    {{else}}
+      <div class="row">
+    {{/if}}
+      <div class="left">
+        {{prop.name}}
+        {{#if prop.edition_info}} <div class='red'> {{prop.edition_info}} </div> {{/if}}
+        {{#if prop.canLoop}}
+          <div><a onclick="toggle_visibility(this,'{{@root.href}}_{{prop.name}}_');" class='link'> Show Attributes </a></div>
+        {{/if}}
+      </div>
+      <div class="right">
+        <div>{{prop.kind}} {{{kindReason}}}</div>
+        <div>{{{prop.description}}}</div>
+      </div>
+    </div>
+    {{#if prop.canLoop}}
+      {{partial-attributes templateName='attributes-table' properties=prop.subJSON.listJSON href=@root.href isSubJson=true propName=prop.name}}
+    {{/if}}
+  {{/if}}
+{{/each}}

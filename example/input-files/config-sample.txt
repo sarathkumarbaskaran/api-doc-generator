@@ -1,0 +1,32 @@
+{
+  "product": "Purchase Store", // Product Name
+  "producturl": "https://purchasestore.com", // Product URL
+  "apiendpoint": "https://purchasestore.com/api", // API end point URL
+  "title": "Purchase Store | API doc",
+  "favicon": "https://store.com/favicon.ico", // Favicon
+  "logo": {
+    "src": "https://store.com/images/invoice.png",
+    "href": "/store/"
+  },
+  "topband": {
+    "twitterurl": "https://twitter.com/intent/tweet?text=Great%20%23API%20documentation%20for%20%23invoicing%20and%20%23time%20tracking.%20Check%20this%20out%20%40Purchase%20Store",
+    "link": [
+      {
+        "name": "Home",
+        "href": "https://purchasestore.com"
+      },
+      {
+        "name": "Features",
+        "href": "https://purchasestore.com/tour"
+      },
+      {
+        "name": "Pricing",
+        "href": "https://purchasestore.com/pricing"
+      }
+    ],
+    "signinurl": "https://purchasestore.com/login"
+  },
+  "index":[
+    "Items",
+  ]
+}

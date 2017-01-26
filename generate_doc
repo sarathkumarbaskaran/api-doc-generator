@@ -1,0 +1,387 @@
+#!/usr/bin/env node
+
+'use restrict'
+
+const YAML = require('yamljs');
+const fs = require('fs');
+const handlebars = require('handlebars');
+const path = require('path');
+const logger = require('./lib/logger');
+const registerHbsHelper = require('./lib/hbs-helper');
+const jsonfile = require('jsonfile');
+
+
+(function(){
+  var reporter = {};
+  exports.generateDoc = reporter.generateDoc = function(directory_path){
+    var htmlStream = '';
+    var includes = [];
+    var yamlContent;
+    var content = {htmlStream: '', includes: [], config: {}};
+
+    if (!directory_path) {
+      logger.error("Please give a valid directory path");
+      return;
+    } else {
+      if (!fs.existsSync(directory_path)) {
+        logger.error("File does not exist in the path");
+        return;
+      }
+    }
+
+    var configFile = `${directory_path}/config.json`;
+    if(!fs.existsSync(configFile)) {
+      logger.warn('Config file not found');
+    } else {
+      content.config = jsonfile.readFileSync(configFile);
+    }
+    var index = content.config.index;
+
+    registerHbsHelper({directory_path});
+    deleteFolderRecursive('build');
+    computeNavbarStaticElements(content);
+    logger.info("Started Building API Document");
+
+    fs.readdir(directory_path, (err, files) => {
+      index.forEach(name => {
+        var file = name.toLowerCase() + '.yml';
+        if(!fs.existsSync(directory_path+file)) {
+          logger.warn(file+' file not found');
+        } else {
+          logger.info('Processing ' +file + '...');
+          yamlContent = YAML.load(directory_path+file);
+          generateHTMLFragment(content, yamlContent, file);
+          generateEndpointHTMLFragment(content, yamlContent);
+          logger.success('Completed processing' +file);
+        }
+      });
+
+      var sourceFile = fs.readFileSync('handlebars/index.hbs', 'utf-8');
+      var hbsSource = handlebars.compile(sourceFile);
+      var templateStream = hbsSource({includes: content.includes, htmlStream: content.htmlStream, config: content.config});
+
+
+      var buildDir = './build';
+      if (!fs.existsSync(buildDir)) {
+        fs.mkdirSync(buildDir);
+      }
+      logger.info('Copying files to build/ ');
+      fs.writeFile(buildDir+'/index.html', templateStream);
+
+      copySync('styles', 'build/styles');
+      copySync('javascripts', 'build/js');
+      copySync('images', 'build/images');
+
+      logger.success('API document generated succefully!');
+    });
+  };
+
+  function deleteFolderRecursive(path) {
+    if( fs.existsSync(path) ) {
+      fs.readdirSync(path).forEach(function(file) {
+        var curPath = path + "/" + file;
+        if(fs.statSync(curPath).isDirectory()) { // recurse
+          deleteFolderRecursive(curPath);
+        } else { // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
+    }
+  };
+
+  function computeNavbarStaticElements(content) {
+    var config = content.config;
+    var navStatics = config.navbarStaticElements;
+    if (!navStatics) {
+      logger.warn('Please specify navbarStaticElements in config file for Introduction.');
+      return;
+    }
+    var nav_elements = [];
+    navStatics.forEach(element => {
+      nav_elements.push({
+        name: element.name,
+        href: element.href,
+        subLinks: element.links,
+        parentScopeNotRequired: true
+      });
+    });
+    content.includes = nav_elements;
+  }
+
+  function copySync(src, dest){
+
+    var hasStyles = fs.existsSync(src);
+
+    if (hasStyles) {
+      var hasBuildStyles = fs.existsSync(dest);
+      if (!hasBuildStyles) {
+        fs.mkdirSync(dest);
+      }
+      fs.readdirSync(src).forEach(function(childItemName) {
+        fs.linkSync(path.join(src, childItemName), path.join(dest, childItemName));
+      });
+    }
+  }
+
+  function generateHTMLFragment(content, yamlContent) {
+    var jsonData = {};
+    var title = yamlContent.title;
+    var description = yamlContent.description;
+    var properties = yamlContent.properties;
+    if (!yamlContent.properties) {
+      logger.error(`Properties is missing for ${title}`);
+      return;
+    }
+
+    var example = constructResourceExample(yamlContent, properties);
+    var atttributes = constructAttributes(yamlContent, {}, {}, properties);
+    jsonData['title'] = title;
+    jsonData['href'] = title.replace(/[\s/]/g, '_');
+    jsonData['description'] = description;
+    jsonData['example'] = JSON.stringify(example, null, 4);
+    jsonData['properties'] = atttributes;
+    jsonData['test'] = JSON.stringify(atttributes, null, 4);
+
+    var sourceFile = fs.readFileSync('handlebars/resource.hbs', 'utf-8');
+    var hbsSource = handlebars.compile(sourceFile);
+    var templateStream = hbsSource(jsonData);
+
+    content.htmlStream += templateStream;
+  }
+
+  function generateEndpointHTMLFragment(content, yamlContent) {
+    var subLinkArray=[];
+    var endPoints = [];
+    var subContent;
+    var endpointJSON='';
+    var endointAttributes;
+    var reqProps = [];
+    var respProps = [];
+    var jsonData = {};
+    var finalResposnseExample = {};
+    var endpointResponseExampleWithPath = {};
+    var isStringRequest = content.config.isJSONStringRequest;
+    var link;
+
+    endPoints = yamlContent.links || [];
+    for(var i=0; i<endPoints.length; i++) {
+      finalResposnseExample = {};
+      endpointResponseExampleWithPath = {};
+      subContent = yamlContent.links[i] || {};
+      if (subContent.request && subContent.request.properties) {
+        reqProps = subContent.request.properties;
+      } else {
+        reqProps = [];
+      }
+      if (subContent.response && subContent.response.properties) {
+        respProps = subContent.response.properties;
+      } else {
+        respProps = [];
+      }
+      endpointReqExample = generateEndpointExample(yamlContent, subContent.request, reqProps, subContent.request);
+      endpointRespExample = generateEndpointExample(yamlContent, subContent.response, respProps, subContent.response);
+      var prefixJSON = {code: subContent.code || 0, message: subContent.message || 'success'};
+      if (subContent['response_path']) {
+        if (subContent['rel'] === 'instances') {
+          endpointResponseExampleWithPath[subContent.response_path] = [endpointRespExample, {}, {}];
+        } else {
+          endpointResponseExampleWithPath[subContent.response_path] = endpointRespExample;
+        }
+
+      } else {
+        endpointResponseExampleWithPath = endpointRespExample;
+      }
+      finalResposnseExample = Object.assign(finalResposnseExample, prefixJSON, endpointResponseExampleWithPath);
+      endointAttributes = constructAttributes(yamlContent, subContent.request, {}, reqProps);
+      jsonData['rootResource'] = yamlContent.title.replace(/[\s/]/g, '_');
+      jsonData['title'] = subContent.title;
+      jsonData['href'] = (subContent.title).replace(/[\s/]/g, '_');
+      jsonData['description'] = subContent.description;
+      jsonData['ajaxMethod'] = subContent.method;
+      jsonData['resourceUrl'] = subContent.url;
+      jsonData['urlSuffix'] = content.config.apiendpoint_suffix;
+      jsonData['rel'] = subContent.rel;
+      if (jsonData['queryParams'] = subContent.queryParams) {
+        jsonData['queryParams'] = constructAttributes(yamlContent, subContent.queryParams, {}, subContent.queryParams.properties);
+      }
+      jsonData['isJSONString'] = isStringRequest;
+      jsonData['reqExample'] = JSON.stringify(endpointReqExample, null, 4);
+      jsonData['respExample'] = JSON.stringify(finalResposnseExample, null, 4).replace(/{}/g, "{...}");
+      jsonData['properties'] = endointAttributes;
+      if ((Object.keys(endpointReqExample)).length === 0) {
+        jsonData['reqExample'] = undefined;
+      }
+      jsonData['config'] = content.config;
+      epFile = fs.readFileSync('handlebars/endpoint.hbs', 'utf-8');
+      ephbsSource = handlebars.compile(epFile);
+      content.htmlStream += ephbsSource(jsonData);
+      var link=subContent.title.replace(/[\s/]/g, "_");
+      subLinkArray.push({name: subContent.title, href: link});
+    }
+    content.includes.push({name: yamlContent.title, subLinks: subLinkArray, href: yamlContent.title.replace(/[\s/]/g, "_")});
+  }
+
+
+  function constructResourceExample(yamlContent, properties) {
+    var exampleJSON = {};
+    var definition = yamlContent.definitions;
+    var length = properties.length;
+    for(var i=0; i < length ; i++) {
+      var key = properties[i];
+      var type = definition[key]['type'];
+      if (type === 'object' || type === 'list') {
+        var listProps = [];
+        if (definition[key] && definition[key]['properties']) {
+          listProps = definition[key]['properties'];
+        } else if (yamlContent[key] && yamlContent[key]['properties']) {
+          listProps = yamlContent[key]['properties'];
+        }
+        var listJSON = constructResourceExample(yamlContent, listProps);
+        exampleJSON[key] = type === 'object' ? listJSON : [listJSON];
+      } else {
+        exampleJSON[key] = definition[key]['example'];
+      }
+    }
+    return exampleJSON;
+  }
+
+  function generateEndpointExample(yamlContent, childContent, properties, recDef) {
+    var exampleJSON = {};
+    var definition = yamlContent.definitions;
+    var type = 'string';
+    var length = properties.length;
+    for(var i=0; i < length ; i++) {
+      var key = properties[i];
+      if (recDef && recDef[key]) {
+        type = recDef[key]['type'];
+      } else if (childContent && childContent[key]) {
+        type = childContent[key]['type'];
+      } else if (definition && definition[key]){
+        type = definition[key]['type'];
+      } else if (yamlContent[key]){
+        type = yamlContent[key]['type'];
+      }
+      if (type === 'object' || type === 'list') {
+        var listProps = [];
+        if (recDef && recDef[key] && recDef[key]['properties']) {
+          listProps = recDef[key]['properties'];
+        } else if (childContent[key] && childContent[key]['properties']) {
+          listProps = childContent[key]['properties'];
+        } else if (definition && definition[key] && definition[key]['properties']) {
+          listProps = definition[key]['properties'];
+        } else if (yamlContent[key] && yamlContent[key]['properties']) {
+          listProps = yamlContent[key]['properties'];
+        }
+        var listJSON = generateEndpointExample(yamlContent, childContent, listProps, childContent[key]);
+        exampleJSON[key] = type === 'object' ? listJSON : [listJSON];
+      } else {
+        if (childContent[key]) {
+          exampleJSON[key] = childContent[key]['example'];
+        } else {
+          exampleJSON[key] = definition[key]['example'];
+        }
+      }
+    }
+    return exampleJSON;
+  }
+
+
+  function constructAttributes(yamlContent, childContent, innerChild, properties) {
+    var attributeJSON = [];
+    var definition = yamlContent.definitions;
+    var length = properties.length;
+    var requiredList = [];
+    var subRequiredList = [];
+    if (innerChild) {
+      requiredList = innerChild.required || [];
+    }
+    if (childContent) {
+      subRequiredList = childContent.required || [];
+    }
+    for(var i=0; i < length ; i++) {
+      var key = properties[i];
+      var type = definition[key]['type'];
+      if (type === 'object' || type === 'list') {
+        var listProps = [];
+        var kind = '';
+        var kindReason = '';
+
+        if (innerChild && innerChild[key] &&innerChild[key]['properties']) {
+          listProps = innerChild[key]['properties'];
+        } else if (childContent && childContent[key] && childContent[key]['properties']) {
+          listProps = childContent[key]['properties'];
+        } else if (definition[key] && definition[key]['properties']) {
+          listProps = definition[key]['properties'];
+        } else if (yamlContent[key] && yamlContent[key]['properties']) {
+          listProps = yamlContent[key]['properties'];
+        }
+
+        if ((requiredList.indexOf(key) !== -1) || (subRequiredList.indexOf(key) !== -1) || (innerChild && innerChild[key] && innerChild[key]['required_info']) || (childContent && childContent[key] && childContent[key]['required_info']) || (definition[key]['required_info'])) {
+          kind = 'Required';
+
+          if (innerChild && innerChild[key] && innerChild[key]['required_info']) {
+            kindReason = innerChild[key]['required_info'];
+          } else if (childContent && childContent[key] && childContent[key]['required_info']) {
+            kindReason = childContent[key]['required_info'];
+          } else {
+            kindReason = definition[key]['required_info'];
+          }
+        } else {
+          kind = 'Optional';
+          kindReason = '';
+          if (innerChild && innerChild[key] && innerChild[key]['default']) {
+            kindReason = innerChild[key]['default'];
+          } else if (childContent && childContent[key] && childContent[key]['default']) {
+            kindReason = '<span>, default is' + childContent[key]['default'] +'</span>';
+          } else if (definition[key]['default']){
+            kindReason = '<span>, default is' + definition[key]['default'] + '</span>';
+          }
+        }
+        if (childContent && childContent[key]) {
+          innerChild = childContent[key];
+        }
+        var listJSON = constructAttributes(yamlContent, childContent, innerChild, listProps);
+        attributeJSON.push({name: key, type: type, description: definition[key]['description'], kind: kind, kindReason: kindReason, canLoop: true, subJSON: {listJSON}});
+      } else {
+
+        if (childContent && childContent[key]) {
+          childContent[key]['name'] = key;
+          if (requiredList.indexOf(key) !== -1 || subRequiredList.indexOf(key) !== -1 || childContent[key]['required_info']) {
+            childContent[key]['kind'] = 'Required';
+            childContent[key]['kindReason'] = childContent[key]['required_info'];
+          } else {
+            if (childContent[key]['default']) {
+              childContent[key]['kindReason'] = '<span>, default is ' + childContent[key]['default'] + '</span>';
+            }
+            childContent[key]['kind'] = 'Optional';
+          }
+
+          if (!childContent[key]['description'] && definition[key] && definition[key]['description']) {
+            childContent[key]['description'] = definition[key]['description'];
+          }
+          attributeJSON.push(childContent[key]);
+        } else {
+          definition[key]['name'] = key;
+          if (requiredList.indexOf(key) !== -1 || subRequiredList.indexOf(key) !== -1 || definition[key]['required_info']) {
+            definition[key]['kind'] = 'Required';
+            definition[key]['kindReason'] = definition[key]['required_info'];
+          } else {
+            definition[key]['kind'] = 'Optional';
+            if (definition[key]['default']) {
+              definition[key]['kindReason'] = '<span>, default is ' + definition[key]['default'] + '</span>';
+            }
+          }
+          attributeJSON.push(definition[key]);
+        }
+      }
+    }
+    return attributeJSON;
+  }
+
+  var dir_path = process.argv[2];
+  if (!module.parent) {
+    reporter.generateDoc(dir_path);
+  }
+
+})();

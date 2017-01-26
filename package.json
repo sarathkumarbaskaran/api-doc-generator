@@ -1,0 +1,14 @@
+{
+  "name": "api-doc-generator",
+  "version": "0.0.1",
+  "description": "API document generator",
+  "author": "sarathkumar.b",
+  "dependencies": {
+    "yamljs": "^0.2.8",
+    "handlebars": "^4.0.5",
+    "fs": "0.0.2",
+    "path": "0.12.7",
+    "chalk": "^1.1.1",
+    "jsonfile": "^2.2.3"
+  }
+}

@@ -1,0 +1,78 @@
+---
+title: Items
+description: An item available for sale.
+definitions:
+ item_id:
+  description: Unique ID.
+  type: string
+  example: 0987654345678
+ name:
+  description: Name of the item. <code>Maximum length of the name [100]</code>
+  type: string
+  example: Hard Drive
+ rate:
+  description: Per unit price of an item.
+  type: double
+  example: 120.00
+properties: [item_id, name, rate]
+
+links:
+-
+ title: Create an Item
+ description: Create a new item.
+ url: "/items"
+ method: POST
+ rel: create
+ message: The item has been added.
+ request:
+  properties: [name, rate]
+  required: [name,rate]
+ response:
+  item:
+    type: object
+    properties: [item_id, name, rate]
+  properties: [item]
+-
+ title: Update an item
+ description: Update the details of an existing item.
+ url: "/items/{item_id}"
+ method: PUT
+ rel: update
+ message: Item details have been saved.
+ request:
+  properties: [name, rate]
+  required: [name,rate]
+ response:
+  item:
+    type: object
+    properties: [item_id, name]
+  properties: [item]
+-
+ title: Retrieve an item
+ description: Fetch details of an existing item.
+ url: "/items/{item_id}"
+ method: GET
+ rel: self
+ message: success
+ response:
+  item:
+    type: object
+    properties: [item_id, name]
+  properties: [item]
+-
+ title: List items
+ description: Get the list of all active items with pagination.
+ url: "/items"
+ method: GET
+ rel: instances
+ message: success
+ response_path: items
+ response:
+  properties: [item_id, name]
+-
+ title: Delete an item
+ description: Delete an existing item. Items that are part of a transaction cannot be deleted.
+ url: "/items/{item_id}"
+ method: DELETE
+ rel: delete
+ message: The item has been deleted.

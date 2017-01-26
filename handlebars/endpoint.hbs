@@ -1,0 +1,72 @@
+{{#if title}}
+  <div name="{{title}}" class="resource"></div>
+  <h1 id="{{rootResource}}_{{href}}">{{title}}</h1>
+  {{#if description}}
+    <p>{{{description}}} </p>
+  {{/if}}
+{{/if}}
+
+<blockquote>
+  <div class="resourceURI"> {{ajaxMethod}} {{resourceUrl}} </div>
+</blockquote>
+
+
+<blockquote>
+  <p> Request Example </p>
+</blockquote>
+<pre class="prettyprint">
+<code>
+
+$ curl {{config.apiendpoint}}{{resourceUrl}}{{#if urlSuffix}}{{urlSuffix}}{{/if}}
+{{#unless config.isParams}}
+-H "HEADER-1: SAMPLE1"
+-H "HEADER-2: SAMPLE2" \
+{{/unless}}
+{{#if reqExample}}
+{{#if isJSONString}}
+-d JSONString='{{reqExample}}'
+{{else}}
+-d '{{reqExample}}
+{{/if}}
+
+{{/if}}
+</code>
+</pre>
+
+<blockquote>
+  <p> Response Example </p>
+</blockquote>
+<pre class="prettyprint">
+<code>
+HTTP/1.1 {{#if (equal rel 'create')}}201 Created{{else}}200 OK{{/if}}
+Content-Type:application/json;charset=UTF-8
+{{respExample}}
+</code>
+</pre>
+
+{{#if properties}}
+<h3 id="attributes"> ARGUMENTS </h3>
+<table>
+  <tr>
+    <td>
+      <div class="parameter">
+        {{partial-attributes templateName='attributes-table' properties=properties href=href}}
+      </div>
+    </td>
+  </tr>
+
+</table>
+{{/if}}
+
+{{#if queryParams}}
+<h3 id="attributes"> Query Params </h3>
+<table>
+  <tr>
+    <td>
+      <div class="parameter">
+        {{partial-attributes templateName='attributes-table' properties=queryParams href=href}}
+      </div>
+    </td>
+  </tr>
+</table>
+{{/if}}

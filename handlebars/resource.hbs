@@ -1,0 +1,58 @@
+{{#if title}}
+  <div name="{{title}}" class="resource"></div>
+  <h1 id="{{href}}_{{title}}">{{title}}</h1>
+  {{#if description}}
+    <p>{{description}} </p>
+  {{/if}}
+{{/if}}
+
+<blockquote>
+  <p> Example </p>
+</blockquote>
+<pre class="prettyprint">
+<code>
+{{example}}
+{{links}}
+</code>
+</pre>
+<h3 id="attributes"> ATTRIBUTES </h3>
+<table>
+
+  <tr>
+    <td>
+      <div class="parameter">
+      {{#each properties as |prop|}}
+        {{#if prop.name}}
+        <div class="row">
+          <div class="left">
+            {{prop.name}}
+            {{#if prop.canLoop}}
+            <div><a onclick="toggle_visibility(this,'{{@root.href}}_{{prop.name}}_');" class='link'> Show Attributes </a></div>
+            {{/if}}
+          </div>
+          <div class="right">
+            <div>{{prop.type}}</div>
+            <div>{{{prop.description}}}</div>
+          </div>
+        </div>
+
+      {{#if prop.canLoop}}
+      {{#each prop.subJSON.listJSON as |subrow|}}
+        <div class="{{@root.href}}_ {{@root.href}}_{{prop.name}}_ attribute row">
+          <div class="left">
+            {{subrow.name}}
+          </div>
+          <div class="right">
+            <div>{{subrow.type}}</div>
+            <div>{{{subrow.description}}}</div>
+          </div>
+        </div>
+      {{/each}}
+      {{/if}}
+     {{/if}}
+    {{/each}}
+      </div>
+    </td>
+  </tr>
+
+</table>
